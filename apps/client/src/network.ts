@@ -4,6 +4,7 @@ import type { ClientEvents, ServerEvents, RoomView, Reply, ProfileInput, LobbyAc
 import type { Action, Size } from '../../../packages/game-engine/src/types';
 import { gameServerUrl } from './paths';
 type Session = { code: string; token: string };
+const unreachable = gameServerUrl ? 'Couldn’t reach the game server. Try again.' : 'Cannot reach the host. Check Wi-Fi and keep the host running.';
 export function useConnection() {
   const socket = useRef<Socket<ServerEvents, ClientEvents> | null>(null);
   const [view, setView] = useState<RoomView | null>(null), [online, setOnline] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState('');
@@ -27,12 +28,14 @@ export function useConnection() {
       } catch { localStorage.removeItem('morrow-session'); }
     });
     s.on('disconnect', () => { setOnline(false); pending.current = false; setBusy(false); });
-    s.on('connect_error', () => setError('Cannot reach the host. Check Wi-Fi and keep the host running.'));
+    s.on('connect_error', () => setError(unreachable));
     s.on('replaced', () => { setError('This seat is open in another tab. Close that tab and refresh to return here.'); s.disconnect(); });
     s.connect(); return () => { s.disconnect(); };
   }, []);
   const send = (execute: (ack: (r: Reply) => void) => void) => {
-    if (!online || pending.current) return;
+    // Never let a click look ignored: explain, and retry the connection.
+    if (!online) { setError(unreachable); socket.current?.connect(); return; }
+    if (pending.current) return;
     pending.current = true; setBusy(true); setError('');
     const timeout = window.setTimeout(() => { pending.current = false; setBusy(false); setError('The host did not respond. Reconnecting to refresh the board.'); socket.current?.disconnect().connect(); }, 8000);
     execute(reply => { clearTimeout(timeout); pending.current = false; setBusy(false); if (!reply.ok) setError(reply.error);
