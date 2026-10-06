@@ -1,0 +1,22 @@
+# Conquest of Pizzeria authoritative game server (rooms, rules, dice, AI) for the STAIGE-hosted client.
+# Rooms live in memory: keep exactly one instance.
+services:
+  - type: web
+    name: conquest-of-pizzeria-server
+    runtime: node
+    plan: free # Free instances sleep after ~15 idle minutes, ending any in-memory rooms. Use starter for always-on.
+    region: oregon
+    branch: main
+    buildCommand: npm ci --include=dev # tsx (a devDependency) runs the TypeScript server
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: 22.18.0
+      - key: NODE_ENV
+        value: production
+      - key: ALLOWED_ORIGINS
+        value: https://games.staige.world,https://play.games.staige.world
+      - key: ADVERTISE_LAN
+        value: "false"

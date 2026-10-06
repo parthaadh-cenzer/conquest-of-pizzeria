@@ -7,12 +7,13 @@ import { RoomManager, type Room } from './rooms';
 import { profileSchema, type ClientEvents, type ServerEvents, type Reply } from '../../../packages/protocol/src/index';
 // Comma-separated browser origins allowed besides the host's own page, e.g. https://play.games.staige.world.
 const parseOrigins = (value = '') => value.split(',').map(o => o.trim().replace(/\/+$/, '')).filter(Boolean);
-export function makeServer(port: number, allowedOrigins = parseOrigins(process.env.ALLOWED_ORIGINS)) {
+// ADVERTISE_LAN=false hides the host's network addresses, e.g. on a cloud host where they are internal.
+export function makeServer(port: number, allowedOrigins = parseOrigins(process.env.ALLOWED_ORIGINS), advertiseLan = process.env.ADVERTISE_LAN !== 'false') {
   const app = express(), http = createServer(app);
   app.disable('x-powered-by');
   app.use((_req, res, next) => { res.setHeader('X-Content-Type-Options', 'nosniff'); res.setHeader('Referrer-Policy', 'no-referrer'); next(); });
   const addresses = [...new Set(Object.values(networkInterfaces()).flatMap(items => (items ?? []).filter(i => i.family === 'IPv4' && !i.internal).map(i => i.address)))];
-  const urls = addresses.map(ip => `http://${ip}:${port}`);
+  const urls = advertiseLan ? addresses.map(ip => `http://${ip}:${port}`) : [];
   const manager = new RoomManager(urls.length ? urls : [`http://localhost:${port}`]);
   const io = new Server<ClientEvents, ServerEvents>(http, { maxHttpBufferSize: 150000, cors: allowedOrigins.length ? { origin: allowedOrigins } : undefined, allowRequest: (req, done) => {
     const origin = req.headers.origin;
