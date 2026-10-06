@@ -1,0 +1,27 @@
+# Dependencies and build output (STAIGE rebuilds from source)
+node_modules/
+dist/
+*.tsbuildinfo
+.vite/
+
+# Test and simulation output
+test-results/
+playwright-report/
+artifacts/
+coverage/
+
+# Logs, caches, OS files
+*.log
+.DS_Store
+Thumbs.db
+
+# Local environment files (.env.production is committed: it holds only public build settings)
+.env
+.env.local
+.env.*.local
+
+# Raw source assets and media kept only on the author's machine.
+# Runtime copies live in apps/client/public/; see CREDITS.md and docs/ASSET_AUDIT.md.
+assets/
+bg music.mp3
+Promo/
