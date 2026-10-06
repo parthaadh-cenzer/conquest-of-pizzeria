@@ -34,7 +34,7 @@ Conquest of Pizzeria is a **browser client plus a Node.js game server** (Socket.
 | --- | --- |
 | Node.js | 22.18+ (npm 10) |
 | Clean install | `npm ci --ignore-scripts` |
-| Build | `npm run build` (= `tsc --noEmit && vite build`) |
+| Build | `npm run build:staige` (= `tsc --noEmit && vite build --mode staige`, which reads `.env.staige`). Plain `npm run build` is the self-hosted/LAN build. |
 | Output directory | `dist/client` |
 | Entry | `dist/client/index.html` |
 | Build-time secrets | None |
@@ -50,7 +50,7 @@ The client is subpath-safe (Vite `base: './'`). Every model, the music file and 
    - start: `npm start` (this also serves the client at `/` as a fallback)
    - environment: `PORT` (usually set by the host) and `ALLOWED_ORIGINS=https://games.staige.world,https://play.games.staige.world`
 2. Check `https://<your-server>/api/health` returns `{"ok":true,...}`.
-3. Set `VITE_GAME_SERVER_URL=https://<your-server>` (production: `https://conquest-of-pizzeria-server.onrender.com`, defined in `render.yaml`) in [`.env.production`](.env.production), commit, and push. The STAIGE build bakes it into the client.
+3. Set `VITE_GAME_SERVER_URL=https://<your-server>` (production: `https://conquest-of-pizzeria-server.onrender.com`, service defined in `render.yaml`) in [`.env.staige`](.env.staige), commit, and push. `npm run build:staige` bakes it into the client.
 4. Enter the same `https://<your-server>` as STAIGE's **External Backend URL**.
 
 `ALLOWED_ORIGINS` is a comma-separated allow-list. Without it, the server accepts only clients served from its own origin, which is the LAN behavior. Rooms are in memory: a server restart ends matches in progress. Use a host that keeps a single instance running, with no scale-to-zero and no multiple replicas.

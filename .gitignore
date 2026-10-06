@@ -15,7 +15,7 @@ coverage/
 .DS_Store
 Thumbs.db
 
-# Local environment files (.env.production is committed: it holds only public build settings)
+# Local environment files (.env.staige is committed: it holds only public build settings)
 .env
 .env.local
 .env.*.local

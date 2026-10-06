@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "tsx apps/server/src/main.ts",
     "build": "tsc --noEmit && vite build",
+    "build:staige": "tsc --noEmit && vite build --mode staige",
     "start": "tsx apps/server/src/main.ts --production",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
